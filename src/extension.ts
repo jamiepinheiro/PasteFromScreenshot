@@ -1,29 +1,70 @@
 'use strict';
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import * as request from "request-promise-native";
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-    // Use the console to output diagnostic information (console.log) and errors (console.error)
-    // This line of code will only be executed once when your extension is activated
-    console.log('Congratulations, your extension "paste-from-screenshot" is now active!');
+    let disposable = vscode.commands.registerCommand('extension.pasteFromScreenshot', async () => {
+        let imageUrl = await vscode.window.showInputBox({
+            prompt: 'Enter screenshot url',
+            validateInput: (text: string): string | undefined => {
+                if (!text || text.indexOf('.') === -1) {
+                    return 'You must enter a valid url';
+                } else {
+                    return undefined;
+                }
+            }
+        });
 
-    // The command has been defined in the package.json file
-    // Now provide the implementation of the command with  registerCommand
-    // The commandId parameter must match the command field in package.json
-    let disposable = vscode.commands.registerCommand('extension.sayHello', () => {
-        // The code you place here will be executed every time your command is executed
+        // Replace <Subscription Key> with your valid subscription key.
+        const subscriptionKey = 'd9177a6ecb3442a0873c4ccacd3f9e5e';
 
-        // Display a message box to the user
-        vscode.window.showInformationMessage('Hello World!');
+        // You must use the same location in your REST call as you used to get your
+        // subscription keys. For example, if you got your subscription keys from
+        // westus, replace "westcentralus" in the URL below with "westus".
+        const uriBase = 'https://westcentralus.api.cognitive.microsoft.com/vision/v2.0/ocr';
+
+        // Request parameters.
+        const params = {
+            'language': 'unk',
+            'detectOrientation': 'true',
+        };
+
+        const options = {
+            uri: uriBase,
+            qs: params,
+            body: '{"url": ' + '"' + imageUrl + '"}',
+            headers: {
+                'Content-Type': 'application/json',
+                'Ocp-Apim-Subscription-Key': subscriptionKey
+            }
+        };
+
+        request.post(options, (error, response, body) => {
+            if (error) {
+                console.log('Error: ', error);
+                return;
+            }
+
+            let lines = JSON.parse(body).regions[0].lines;
+            console.log(lines);
+
+            let previewText = "";
+            
+            lines.forEach((line: any) => {
+                line.words.forEach((word: any) => {
+                    previewText += word.text + ' ';
+                });
+                previewText += '\n';
+            });
+
+            vscode.window.showInformationMessage(previewText);
+            
+        });
+
     });
-
     context.subscriptions.push(disposable);
 }
 
-// this method is called when your extension is deactivated
 export function deactivate() {
 }

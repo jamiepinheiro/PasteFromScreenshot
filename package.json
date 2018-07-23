@@ -11,14 +11,14 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.sayHello"
+        "onCommand:extension.pasteFromScreenshot"
     ],
     "main": "./out/extension",
     "contributes": {
         "commands": [
             {
-                "command": "extension.sayHello",
-                "title": "Hello World"
+                "command": "extension.pasteFromScreenshot",
+                "title": "Paste From Screenshot"
             }
         ]
     },
@@ -35,5 +35,12 @@
         "tslint": "^5.8.0",
         "@types/node": "^7.0.43",
         "@types/mocha": "^2.2.42"
+    },
+    "dependencies": {
+        "@types/request": "^2.47.1",
+        "@types/request-promise-native": "^1.0.15",
+        "axios": "^0.18.0",
+        "request": "^2.87.0",
+        "request-promise-native": "^1.0.5"
     }
 }
