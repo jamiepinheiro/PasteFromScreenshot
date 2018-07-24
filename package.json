@@ -41,5 +41,6 @@
         "@types/request-promise-native": "^1.0.15",
         "request": "^2.87.0",
         "request-promise-native": "^1.0.5"
-    }
+    },
+    "repository": { "type": "git", "url": "https://github.com/jamiepinheiro/PasteFromScreenshot.git" }
 }
